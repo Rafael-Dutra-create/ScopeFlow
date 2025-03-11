@@ -37,7 +37,7 @@ export default function Home() {
 
     // Utiliza clearIndex para remover somente o campo "nome" do objeto "user"
     const handleClearName = async () => {
-        await userScope.clearIndex("user", "nome", 'userScope');
+        await userScope.clearIndex("userScope", "user", 'nome');
         if (nameInputRef.current) {
             nameInputRef.current.value = "";
         }
