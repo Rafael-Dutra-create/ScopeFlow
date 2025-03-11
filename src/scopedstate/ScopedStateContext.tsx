@@ -1,25 +1,29 @@
 // ScopedStateContext.tsx
 "use client";
 
-import { ScopedState } from "@/scopedstate/ScopedState";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {ScopedState} from "@/scopedstate/ScopedState";
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {ScopedStateContextType, ScopedStateProviderProps} from "@/scopedstate/types";
-import { persistScopedStateClient } from "@/actions/actionClient";
-import { persistScopedStateServer } from "@/actions/actionServer";
+import {persistScopedStateClient} from "@/actions/actionClient";
+import {persistScopedStateServer} from "@/actions/actionServer";
 import {debounce} from "next/dist/server/utils";
-
 
 
 const ScopedStateContext = createContext<ScopedStateContextType | null>(null);
 
 export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
+    // Inicializa com objeto vazio (tanto server quanto client)
     const [scopes, setScopes] = useState<Record<string, ScopedState>>(() => {
         const initial: Record<string, ScopedState> = {};
+        return initial; // Inicializa com um objeto vazio
+    });
 
-        if (typeof window === "undefined") return initial;
+    useEffect(() => {
+
+        const initial: Record<string, ScopedState> = {};
 
         // Carregar do localStorage
-        Object.keys(localStorage).forEach(key => {
+        Object.keys(localStorage).forEach((key) => {
             if (key.startsWith("scopedState_")) {
                 const scopeKey = key.replace("scopedState_", "");
                 const value = localStorage.getItem(key);
@@ -30,7 +34,7 @@ export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
         });
 
         // Carregar dos cookies
-        document.cookie.split("; ").forEach(cookie => {
+        document.cookie.split("; ").forEach((cookie) => {
             if (cookie.startsWith("scopedState_")) {
                 const [keyPart, value] = cookie.split("=");
                 const scopeKey = keyPart.replace("scopedState_", "");
@@ -39,31 +43,46 @@ export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
             }
         });
 
-        return initial;
-    });
+        setScopes(initial);
+
+    }, []); // Executa apenas uma vez após o mount
+
 
     const getScope = useCallback((scopedKey: string) => {
-        if (!scopes[scopedKey] && typeof window === "undefined") {
-            const newScope = new ScopedState(undefined);
-            setScopes(prev => ({ ...prev, [scopedKey]: newScope }));
-        }
         return scopes[scopedKey] || new ScopedState(undefined);
     }, [scopes]);
 
-    const persistScope = useCallback(debounce((scopedKey: string, state: Record<string, any>) => {
-        const stateJson = JSON.stringify(state);
+    useEffect(() => {
+        Object.keys(scopes).forEach(scopedKey => {
+            if (!scopes[scopedKey]) {
+                const newScope = new ScopedState(undefined);
+                setScopes(prev => ({ ...prev, [scopedKey]: newScope }));
+            }
+        });
+    }, [scopes]);
 
-        // Persistir no client
-        persistScopedStateClient(scopedKey, stateJson)
+    // Adicionar novo scope via effect se necessário
+    const addScope = useCallback((scopedKey: string, newScope: ScopedState) => {
+        setScopes((prev) => {
+            if (prev[scopedKey]) return prev;
+            return { ...prev, [scopedKey]: newScope };
+        });
+    }, []);
 
-        // Persistir no server
-        persistScopedStateServer(scopedKey, stateJson).catch(console.error);
-    }, 300), []);
+    // Persistência em Client e Server
+    const persistScope = useMemo(
+        () =>
+            debounce((scopedKey: string, state: Record<string, any>) => {
+                if(Object.keys(state).length > 0){
+                    const stateJson = JSON.stringify(state);
+                    persistScopedStateClient(scopedKey, stateJson);
+                    persistScopedStateServer(scopedKey, stateJson).catch(console.error);
+                }
+            }, 300),
+        []
+    );
 
-    const value = useMemo(() => ({
-        getScope,
-        persistScope
-    }), [getScope, persistScope]);
+    const value = useMemo(() => ({ getScope, persistScope, addScope }), [getScope, persistScope, addScope]);
 
     return (
         <ScopedStateContext.Provider value={value}>
@@ -78,16 +97,28 @@ export function useScopedState(scopedKey: string) {
         throw new Error("useScopedState must be used within ScopedStateProvider");
     }
 
-    const { getScope, persistScope } = context;
-    const [scope] = useState(() => getScope(scopedKey));
+    const { getScope, persistScope, addScope } = context;
+    const [scope, setScope] = useState<ScopedState>(() => getScope(scopedKey));
     const [, setVersion] = useState(0);
 
+    // Adicionar novo scope via effect (evita setState durante render)
     useEffect(() => {
-        const unsubscribe = scope.subscribe(() => {
+        const existingScope = getScope(scopedKey);
+        if (!existingScope) {
+            const newScope = new ScopedState(undefined);
+            addScope(scopedKey, newScope);
+            setScope(newScope);
+        } else {
+            setScope(existingScope);
+        }
+    }, [scopedKey, addScope, getScope]);
+
+    //Controle de versão
+    useEffect(() => {
+        return scope.subscribe(() => {
             persistScope(scopedKey, scope.getAll());
-            setVersion(v => v + 1); // Forçar atualização
+            setVersion((v) => v + 1);
         });
-        return unsubscribe;
     }, [scope, scopedKey, persistScope]);
 
     return scope;

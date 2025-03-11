@@ -6,7 +6,6 @@ export default function Teste() {
     const userInfo = scopedState.get<{ nome: string, sobrenome: string }>("user");
     const user = userInfo ?? undefined;
 
-    console.log(user);
 
     return (
         <div className="p-2">

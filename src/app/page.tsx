@@ -10,31 +10,30 @@ export default function Home() {
     const storedUser = userScope.get<{ nome: string; sobrenome: string }>("user");
     const storedToken = verificarScope.get<{ token: string }>("verificar");
 
+    // Recupera a versão atual do escopo
+    const userScopeVersion = userScope.getVersion()
+    const verificarScopeVersion = verificarScope.getVersion()
+
     // Cria referências para os inputs
     const nameInputRef = useRef<HTMLInputElement>(null);
     const surnameInputRef = useRef<HTMLInputElement>(null);
     const tokenInputRef = useRef<HTMLInputElement>(null);
 
-    // Atualiza ou cria o objeto "user" com o nome informado,
-    // preservando o sobrenome já existente (caso exista)
+    // Atualiza ou cria o objeto "user" com o nome informado
     const handleConfirmName = () => {
         const nome = nameInputRef.current?.value || "";
         userScope.update("user", { nome });
     };
-
-    // Atualiza ou cria o objeto "user" com o sobrenome informado,
-    // preservando o nome já existente (caso exista)
+    // Atualiza ou cria o objeto "user" com o sobrenome informado
     const handleConfirmSurname = () => {
         const sobrenome = surnameInputRef.current?.value || "";
         userScope.update("user", { sobrenome });
     };
-
     // Confirma o token na key "verificar"
     const handleConfirmToken = () => {
         const token = tokenInputRef.current?.value || "";
         verificarScope.set("verificar", { token });
     };
-
     // Utiliza clearIndex para remover somente o campo "nome" do objeto "user"
     const handleClearName = async () => {
         await userScope.clearIndex("userScope", "user", 'nome');
@@ -42,7 +41,6 @@ export default function Home() {
             nameInputRef.current.value = "";
         }
     };
-
     // Utiliza clearIndex para remover somente o campo "sobrenome" do objeto "user"
     const handleClearSurname = async () => {
         await userScope.clearIndex('userScope', "user", "sobrenome");
@@ -50,19 +48,17 @@ export default function Home() {
             surnameInputRef.current.value = "";
         }
     };
-
     // Limpa o token (key "verificar")
     const handleClearToken = async () => {
-        await verificarScope.clearKey('userScope', "verificar");
+        await verificarScope.clearKey('verificarScope', "verificar");
         if (tokenInputRef.current) {
             tokenInputRef.current.value = "";
         }
     };
-
     // Limpa todas as keys do scopedState
     const handleClearAll = async () => {
         await userScope.clearAll('userScope');
-        await verificarScope.clearAll('userScope');
+        await verificarScope.clearAll('verificarScope');
         if (nameInputRef.current) {
             nameInputRef.current.value = "";
         }
@@ -74,8 +70,12 @@ export default function Home() {
         }
     };
 
+
+
+
     return (
         <div className="p-2">
+            <h2 className="text-center">{`Versao: ${userScopeVersion}`}</h2>
             {/* Seção de Nome */}
             <div className="mb-4">
                 <h2>Nome</h2>
@@ -124,6 +124,7 @@ export default function Home() {
 
             {/* Seção de Token */}
             <div className="mb-4">
+                <h2 className="text-center">{`Versao: ${verificarScopeVersion}`}</h2>
                 <h2>Token</h2>
                 <input
                     type="text"

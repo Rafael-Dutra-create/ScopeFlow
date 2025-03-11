@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from 'next/server'
 
 
 export async function middleware(request: NextRequest) {
-    const cookieValue = request.cookies.get("scopedState-verificarScope")?.value;
+    const cookieValue = request.cookies.get("scopedState_verificarScope")?.value;
     const scopedState = cookieValue ? JSON.parse(cookieValue) : null;
 
     const token = scopedState?.verificar.token ?? undefined;
@@ -15,6 +15,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/teste'] // Utiliza o array diretamente aqui
+    matcher: ['/teste'] // Utiliza o array diretamente aqui
 };
 

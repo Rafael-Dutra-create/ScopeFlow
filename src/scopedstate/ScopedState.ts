@@ -60,8 +60,13 @@ export class ScopedState {
         }
     }
 
-    async clearIndex(scopedKey:string, key: string, index: string | number): Promise<void> {
+    async clearIndex(scopedKey: string, key: string, index: string | number): Promise<void> {
         const value = this.state[key];
+
+        // Verifica se o valor existe
+        if (typeof value !== 'object' && value === undefined) {
+            return console.warn(`Key '${key}' does not exist in state.`);
+        }
 
         if (Array.isArray(value)) {
             // Se for um array, remove o índice especificado
@@ -72,12 +77,18 @@ export class ScopedState {
         } else {
             throw new Error(`Cannot clear index from non-object, non-array key '${key}'`);
         }
-        clearScopedState(scopedKey)
-        await clearScopedStateServer(scopedKey)
+
+        // Verifica se o valor é um objeto e se está vazio
+        if (typeof value === 'object' && Object.keys(value).length === 0) {
+            delete this.state[key];
+        }
+
+        clearScopedState(scopedKey);
+        await clearScopedStateServer(scopedKey);
         this.notifyListeners();
     }
 
-    private version = 0;
+    private version: number = 0;
 
     getVersion() {
         return this.version;

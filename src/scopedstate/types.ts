@@ -9,4 +9,5 @@ export interface ScopedStateProviderProps {
 export type ScopedStateContextType = {
     getScope: (scopedKey: string) => ScopedState;
     persistScope: (scopedKey: string, state: Record<string, any>) => void;
+    addScope: (scopedKey: string, newScope: ScopedState) => void
 };
