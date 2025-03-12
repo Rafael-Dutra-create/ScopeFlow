@@ -131,7 +131,7 @@ import {NextRequest, NextResponse} from 'next/server'
 
 
 export async function middleware(request: NextRequest) {
-    const cookieValue = request.cookies.get("scopedState_verificarScope")?.value;
+    const cookieValue = request.cookies.get("scopedState_ServerScope")?.value;
     const scopedState = cookieValue ? JSON.parse(cookieValue) : null;
 
     const token = scopedState?.verificar.token ?? undefined;
@@ -280,7 +280,7 @@ function MyComponent() {
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-    const cookieValue = request.cookies.get("scopedState_verificarScope")?.value;
+    const cookieValue = request.cookies.get("scopedState_ServerScope")?.value;
     const scopedState = cookieValue ? JSON.parse(cookieValue) : null;
 
     const token = scopedState?.verificar.token ?? undefined;
