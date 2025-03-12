@@ -1,5 +1,5 @@
-import {clearScopedState} from "@/actions/actionClient";
-import {clearScopedStateServer} from "@/actions/actionServer";
+import {clearScopedState} from "./../actions/actionClient";
+import {clearScopedStateServer} from "./../actions/actionServer";
 
 
 export class ScopedState {

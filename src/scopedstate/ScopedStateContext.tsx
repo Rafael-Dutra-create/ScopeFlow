@@ -1,11 +1,11 @@
 // ScopedStateContext.tsx
 "use client";
 
-import {ScopedState} from "@/scopedstate/ScopedState";
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {ScopedStateContextType, ScopedStateProviderProps} from "@/scopedstate/types";
-import {persistScopedStateClient} from "@/actions/actionClient";
-import {persistScopedStateServer} from "@/actions/actionServer";
+import {ScopedState} from "./../scopedstate/ScopedState";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {ScopedStateContextType, ScopedStateProviderProps} from "./types";
+import {persistScopedStateClient} from "./../actions/actionClient";
+import {persistScopedStateServer} from "./../actions/actionServer";
 import {debounce} from "next/dist/server/utils";
 
 
@@ -44,7 +44,6 @@ export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
         });
 
         setScopes(initial);
-
     }, []); // Executa apenas uma vez após o mount
 
 
@@ -72,11 +71,13 @@ export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
     // Persistência em Client e Server
     const persistScope = useMemo(
         () =>
-            debounce((scopedKey: string, state: Record<string, any>) => {
+            debounce((scopedKey: string, state: Record<string, any>, server?: boolean) => {
                 if(Object.keys(state).length > 0){
                     const stateJson = JSON.stringify(state);
                     persistScopedStateClient(scopedKey, stateJson);
-                    persistScopedStateServer(scopedKey, stateJson).catch(console.error);
+                    if(server){
+                        persistScopedStateServer(scopedKey, stateJson).catch(console.error);
+                    }
                 }
             }, 300),
         []
@@ -91,7 +92,7 @@ export function ScopedStateProvider({ children }: ScopedStateProviderProps) {
     );
 }
 
-export function useScopedState(scopedKey: string) {
+export function useScopedState(scopedKey: string, options?: { server?: boolean }) {
     const context = useContext(ScopedStateContext);
     if (!context) {
         throw new Error("useScopedState must be used within ScopedStateProvider");
@@ -116,10 +117,10 @@ export function useScopedState(scopedKey: string) {
     //Controle de versão
     useEffect(() => {
         return scope.subscribe(() => {
-            persistScope(scopedKey, scope.getAll());
+            persistScope(scopedKey, scope.getAll(), options?.server);
             setVersion((v) => v + 1);
         });
-    }, [scope, scopedKey, persistScope]);
+    }, [scope, scopedKey, persistScope, options?.server]);
 
     return scope;
 }
