@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { clearScopedState } from "@/actions/actionClient";
-import { clearScopedStateServer } from "@/actions/actionServer";
-import {ScopedState} from "./../scopedstate/index";
+import { clearScopedState } from "./../actions/actionClient";
+import { clearScopedStateServer } from "./../actions/actionServer";
+import {ScopedState} from './../scopedstate/index';
+
 
 // Mock das funções de limpeza
-vi.mock("@/actions/actionClient", () => ({
+vi.mock("./../actions/actionClient", () => ({
     clearScopedState: vi.fn(),
 }));
 
-vi.mock("@/actions/actionServer", () => ({
+vi.mock("./../actions/actionServer", () => ({
     clearScopedStateServer: vi.fn().mockResolvedValue(undefined),
 }));
 

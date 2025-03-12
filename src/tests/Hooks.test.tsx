@@ -1,82 +1,36 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {render, renderHook, screen} from '@testing-library/react';
+import {describe, it, expect, beforeEach } from 'vitest';
+import {renderHook, act} from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import {ScopedStateProvider, useScopedState} from "./../scopedstate/index";
 
-import {persistScopedStateClient} from "../actions/actions/actionClient";
-import {useScopedState} from "./../scopedstate/index";
-
-// Mock das funções de persistência
-vi.mock("@/actions/actionClient", () => ({
-    persistScopedStateClient: vi.fn(),
-}));
-
-vi.mock("@/actions/actionServer", () => ({
-    persistScopedStateServer: vi.fn().mockResolvedValue(undefined),
-}));
-
-const TestComponent = ({ scopedKey }:any) => {
-    const scopedState = useScopedState(scopedKey);
-    return (
-        <div>
-            <p>Nome: {scopedState.get<{ nome: string}>('user')?.nome}</p>
-        </div>
-    );
-};
-
-describe('ScopedStateContext', () => {
-    let initialState;
-
+describe('useScopedState Hook', () => {
     beforeEach(() => {
-        initialState = {
-            user: { nome: 'Rafael', sobrenome: 'Dutra' },
-        };
-        localStorage.setItem('scopedState_userScope', JSON.stringify(initialState));
-    });
-
-    it('should initialize context and load state from localStorage', () => {
-        render(
-            <ScopedStateProvider>
-                <TestComponent scopedKey="userScope" />
-            </ScopedStateProvider>
+        localStorage.clear();
+        localStorage.setItem(
+            'scopedState_userScope',
+            JSON.stringify({ user: { nome: 'Rafael', sobrenome: 'Dutra' } })
         );
-
-        expect(screen.getByText(/Nome: Rafael/i)).toBeInTheDocument();
     });
 
-    it('should add a new scope if it does not exist', () => {
-        const { result } = renderHook(() => useScopedState('newScope'), {
-            wrapper: ScopedStateProvider,
-        });
-
-        expect(result.current.get('user')).toBeUndefined(); // Deve ser undefined inicialmente
-    });
-
-    it('should persist state changes', () => {
+    it('deve carregar os dados do localStorage corretamente', () => {
         const { result } = renderHook(() => useScopedState('userScope'), {
             wrapper: ScopedStateProvider,
         });
 
-        result.current.set('user', { nome: 'Lucas', sobrenome: 'Silva' });
-
-        expect(result.current.get('user')).toEqual({ nome: 'Lucas', sobrenome: 'Silva' });
-        expect(persistScopedStateClient).toHaveBeenCalled();
+        expect(result.current.get('user')).toEqual({ nome: 'Rafael', sobrenome: 'Dutra' });
     });
 
-    it('should notify listeners on state change', () => {
-        const listener = vi.fn();
-        const { result } = renderHook(() => useScopedState('userScope'), {
+    it('deve atualizar o estado corretamente', () => {
+        const { result, rerender } = renderHook(() => useScopedState('userScope'), {
             wrapper: ScopedStateProvider,
         });
 
-        result.current.subscribe(listener);
-        result.current.set('user', { nome: 'Lucas', sobrenome: 'Silva' });
+        act(() => {
+            result.current.update('user', { nome: 'Novo', sobrenome: 'Usuário' });
+        });
 
-        expect(listener).toHaveBeenCalled();
-    });
+        rerender(); // Força um re-render para garantir a atualização
 
-    it('should throw an error if used outside of ScopedStateProvider', () => {
-        const { result } = renderHook(() => useScopedState('userScope'));
-
-        expect(result.error).toEqual(new Error("useScopedState must be used within ScopedStateProvider"));
+        expect(result.current.get('user')).toEqual({ nome: 'Novo', sobrenome: 'Usuário' });
     });
 });

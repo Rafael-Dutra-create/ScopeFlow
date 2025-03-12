@@ -8,6 +8,6 @@ export interface ScopedStateProviderProps {
 
 export type ScopedStateContextType = {
     getScope: (scopedKey: string) => ScopedState;
-    persistScope: (scopedKey: string, state: Record<string, any>) => void;
+    persistScope: (scopedKey: string, state: Record<string, any>, server: boolean | undefined) => void;
     addScope: (scopedKey: string, newScope: ScopedState) => void
 };
