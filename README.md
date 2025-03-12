@@ -1,4 +1,4 @@
-# 📦 ScopedState - Gerenciador de Estado de Escopo
+# 📦 ScopeFlow - Gerenciador de Estado de Escopo
 
 ScopedState é uma solução moderna e prática para o gerenciamento de estado em aplicações React. Com ela, você pode definir e acessar variáveis globais e outras informações de forma segmentada e centralizada, eliminando a necessidade de prop drilling e múltiplos useStates.
 
@@ -160,7 +160,7 @@ Este projeto está sob a licença MIT.
 --
 ---
 
-# 📦 ScopedState - Scoped State Manager
+# 📦 ScopeFlow - Scoped State Manager
 
 ScopedState is a modern and practical solution for state management in React applications. With it, you can define and access global variables and other data in a segmented, centralized manner, eliminating the need for prop drilling and multiple useStates.
 
