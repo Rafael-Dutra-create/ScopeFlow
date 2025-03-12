@@ -1,10 +1,10 @@
 # 📦 ScopeFlow - Gerenciador de Estado de Escopo
 
-ScopedState é uma solução moderna e prática para o gerenciamento de estado em aplicações React. Com ela, você pode definir e acessar variáveis globais e outras informações de forma segmentada e centralizada, eliminando a necessidade de prop drilling e múltiplos useStates.
+ScopeFlow é uma solução moderna e prática para o gerenciamento de estado em aplicações React. Com ela, você pode definir e acessar variáveis globais e outras informações de forma segmentada e centralizada, eliminando a necessidade de prop drilling e múltiplos useStates.
 
 A biblioteca oferece persistência automática de dados utilizando localStorage no lado do cliente, além de suporte opcional a cookies para o lado do servidor. Isso garante que seus dados permaneçam sincronizados e acessíveis em toda a aplicação.
 
-Com ScopedState, você simplifica o desenvolvimento e melhora a eficiência do gerenciamento de estado, permitindo que você se concentre no que realmente importa: construir experiências incríveis para seus usuários.
+Com ScopeFlow, você simplifica o desenvolvimento e melhora a eficiência do gerenciamento de estado, permitindo que você se concentre no que realmente importa: construir experiências incríveis para seus usuários.
 
 ## 🚀 Instalação
 
@@ -162,11 +162,11 @@ Este projeto está sob a licença MIT.
 
 # 📦 ScopeFlow - Scoped State Manager
 
-ScopedState is a modern and practical solution for state management in React applications. With it, you can define and access global variables and other data in a segmented, centralized manner, eliminating the need for prop drilling and multiple useStates.
+ScopeFlow is a modern and practical solution for state management in React applications. With it, you can define and access global variables and other data in a segmented, centralized manner, eliminating the need for prop drilling and multiple useStates.
 
 The library provides automatic data persistence via localStorage on the client side, along with optional cookie support on the server side. This ensures your data remains synchronized and accessible throughout your entire application.
 
-With ScopedState, you simplify development and enhance state management efficiency, allowing you to focus on what truly matters: building amazing experiences for your users.
+With ScopeFlow, you simplify development and enhance state management efficiency, allowing you to focus on what truly matters: building amazing experiences for your users.
 
 ## 🚀 Installation
 
