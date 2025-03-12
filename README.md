@@ -9,13 +9,13 @@ Com ScopedState, você simplifica o desenvolvimento e melhora a eficiência do g
 ## 🚀 Instalação
 
 ```sh
-npm install scopedstate
+npm install scope-flow
 ```
 
 ou
 
 ```sh
-yarn add scopedstate
+yarn add scope-flow
 ```
 
 ## 📌 Uso
@@ -171,13 +171,13 @@ With ScopedState, you simplify development and enhance state management efficien
 ## 🚀 Installation
 
 ```sh
-npm install scopedstate
+npm install scope-flow
 ```
 
 or
 
 ```sh
-yarn add scopedstate
+yarn add scope-flow
 ```
 
 ## 📌 Usage
